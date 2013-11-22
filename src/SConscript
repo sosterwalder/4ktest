@@ -1,0 +1,67 @@
+import os
+import platform
+
+Import('main_path')
+
+operating_system = platform.system()
+
+if operating_system == 'Darwin':
+    libs = [
+    ]
+else:
+    libs = [
+        'GL',
+        'X11'
+    ]
+
+file_list = [
+	Glob('*.c')
+]
+
+include_dirs = [
+]
+
+flags = [
+    '-fomit-frame-pointer',
+	'-Wall'
+]
+
+link_flags = [
+]
+
+defines = [
+]
+
+if ARGUMENTS.get('debug', 0):
+	flags.extend(['-g'])
+else:
+	flags.extend(['-Os'])
+
+
+env = Environment(
+    CPPPATH = include_dirs,
+	CCFLAGS = flags,
+    CPPDEFINES = defines,
+    ENV = {
+        'PATH' : os.environ['PATH'],
+        'TERM' : os.environ['TERM'],
+        'HOME' : os.environ['HOME']
+    }
+)
+
+if operating_system == 'Darwin':
+    env.Append(
+        RPATH = '/usr/local/lib'
+    )
+    env.Append(
+        LINKFLAGS = link_flags
+    )
+
+env.Program(
+    os.path.join(
+        main_path,
+        'main'
+    ),
+    file_list,
+    LIBS=libs
+)
